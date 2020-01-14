@@ -13,10 +13,13 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.html$/,
-                use: [
-                    "html-loader",
-                ],
+                test: /\.(html)$/,
+                use: {
+                    loader: 'html-loader',
+                    options: {
+                        attrs: [':data-src']
+                    }
+                }
             },
             {
                 test: /\.(svg|png|jpg|jpeg)$/,
@@ -29,5 +32,8 @@ module.exports = {
                 }
             }
         ]
+    },
+    devServer: {
+        historyApiFallback: true
     },
 }
