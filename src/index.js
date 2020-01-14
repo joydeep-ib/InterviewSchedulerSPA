@@ -1,8 +1,12 @@
 import { LolReact } from "./lib/LolReact";
+import { Title } from "./components";
 
 console.log("Hello World");
 
 LolReact.render(
-    LolReact.createElement('h1', null, 'Hello LolReact'),
+    LolReact.createElement(
+        Title,
+        { message: 'Hello Custom Component' }
+    ),
     document.getElementById('root')
 );
