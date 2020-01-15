@@ -79,3 +79,44 @@ export const createInterviewCard = (router, interview, i) => {
   _card.appendChild(_cardFooter);
   return _card;
 }
+
+export const createFormField = (id, labelText, type, name) => {
+  const _container = createDIV('form-group');
+  const _label = document.createElement('label');
+  const _input = document.createElement('input');
+  _input.id = id;
+  _input.type = type;
+  _input.name = name;
+  _input.className = "form-control";
+  _label.setAttribute('for', id);
+  _label.appendChild(document.createTextNode(labelText));
+
+  _container.appendChild(_label);
+  _container.appendChild(_input);
+
+  return _container;
+}
+
+export const createSelectOption = (value, text) => {
+  const _option = document.createElement('option');
+  _option.value = value;
+  _option.text = text;
+  return _option;
+}
+
+export const createMultiSelect = (id, labelText, name) => {
+  const _container = createDIV('form-group');
+  const _label = document.createElement('label');
+  const _input = document.createElement('select');
+  _input.id = id;
+  _input.name = name;
+  _input.className = "form-control";
+  _label.setAttribute('for', id);
+  _input.setAttribute('multiple', '');
+  _input.appendChild(createSelectOption(-1, 'Loading'));
+  _label.appendChild(document.createTextNode(labelText));
+  _container.appendChild(_label);
+  _container.appendChild(_input);
+
+  return _container;
+}
