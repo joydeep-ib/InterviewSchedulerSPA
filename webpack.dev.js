@@ -7,8 +7,9 @@ module.exports = merge(common, {
     output: {
         filename: "[name].js",
         path: path.resolve(__dirname, "dist"),
+        publicPath: '/',
     },
-    // build files aren't uglified 
+    // build files aren't uglified
     mode: "development",
     module: {
         rules: [
