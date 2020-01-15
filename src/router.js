@@ -3,6 +3,7 @@ import { _404Page } from "./components/404";
 export class Router {
     constructor(routes) {
         this.routes = routes;
+        this.currentRoute = null;
         this._loadInitialRoute();
     }
     _matchUrlToRoute(urlSegments) {
@@ -29,6 +30,9 @@ export class Router {
         const matchedRoute = this._matchUrlToRoute(urlSegments) || _404Page;
 
         const url = `/${urlSegments.join('/')}`;
+
+        this.currentRoute = url;
+
         history.pushState({}, '', url);
 
         const rootElem = document.getElementById('root')
@@ -36,7 +40,7 @@ export class Router {
         rootElem.innerHTML = '';
         const _child = await matchedRoute.render({}, this);
         rootElem.appendChild(_child);
-        await matchedRoute.afterRender();
+        await matchedRoute.afterRender(this);
     }
 
     _loadInitialRoute() {
