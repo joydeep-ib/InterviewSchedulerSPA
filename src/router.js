@@ -7,7 +7,8 @@ export class Router {
         this._loadInitialRoute();
     }
     _matchUrlToRoute(urlSegments) {
-        return this.routes.find(route => {
+        const routeParams = {};
+        const matchedRoute =  this.routes.find(route => {
             // Ignore the first one as route.path begins with '/'
             // ie. the first string is going to be empty
             const routePathSegments = route.path.split('/').slice(1);
@@ -16,14 +17,30 @@ export class Router {
             if (routePathSegments.length !== urlSegments.length)
                 return false;
 
-            return routePathSegments
-                // .reduce((matchStatus, pathSegment, idx) =>
-                //     !matchStatus?matchStatus:pathSegment === urlSegments[idx],
-                //     true
-                // )
-                .every((pathSegment,i ) => pathSegment === urlSegments[i])
-        });
+            // return routePathSegments
+            //     // .reduce((matchStatus, pathSegment, idx) =>
+            //     //     !matchStatus?matchStatus:pathSegment === urlSegments[idx],
+            //     //     true
+            //     // )
+            const match = routePathSegments
+                .every((pathSegment, i) => {
+                    return pathSegment === urlSegments[i] || pathSegment[0] === ':';
+                });
 
+            if (match) {
+                routePathSegments.forEach((segment, i) => {
+                    if (segment[0] === ':') {
+                        const propName = segment.slice(1);
+                        routeParams[propName] = decodeURIComponent(urlSegments[i]);
+                    }
+                });
+            }
+            return match;
+        });
+        if (matchedRoute)
+            return { ...matchedRoute, params: routeParams };
+
+        return;
     }
     async loadRoute(...urlSegments) {
         // Get the matching route
@@ -38,7 +55,7 @@ export class Router {
         const rootElem = document.getElementById('root')
         // Clear HTML
         rootElem.innerHTML = '';
-        const _child = await matchedRoute.render({}, this);
+        const _child = await matchedRoute.render(matchedRoute.params, this);
         rootElem.appendChild(_child);
         await matchedRoute.afterRender(this);
     }
