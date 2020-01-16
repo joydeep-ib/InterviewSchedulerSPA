@@ -80,6 +80,24 @@ export const createInterviewCard = (router, interview, i) => {
   return _card;
 }
 
+export const createParticipantCard = (participant) => {
+  const _card = createDIV("card");
+  const _cardBody = createDIV("card-body");
+  _cardBody.appendChild(createTextElement('h4', participant.name.toUpperCase(), 'card-title'));
+  _cardBody.appendChild(createTextElement('h6', `Participant ID: ${participant.id}`, 'card-subtitle mb-2 text-muted'));
+  _cardBody.appendChild(createTextElement('p', participant.email, 'card-text'));
+  const _cardFooter = createDIV("card-footer");
+  const _resumeLink = document.createElement('a');
+  _resumeLink.href = participant.resume;
+  _resumeLink.download = "";
+  _resumeLink.innerHTML = "Download CV"
+  _cardFooter.appendChild(_resumeLink);
+
+  _card.appendChild(_cardBody);
+  _card.appendChild(_cardFooter);
+
+  return _card;
+}
 export const createFormField = (id, labelText, type, name) => {
   const _container = createDIV('form-group');
   const _label = document.createElement('label');

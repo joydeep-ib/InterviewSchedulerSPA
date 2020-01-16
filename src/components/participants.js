@@ -1,4 +1,4 @@
-import { createDIV, createNavBar, createTextElement, createLink } from "../utils/createElement";
+import { createDIV, createNavBar, createTextElement, createLink, createParticipantCard } from "../utils/createElement";
 
 export const ParticipantsPage = {
     path: '/participants',
@@ -27,6 +27,19 @@ export const ParticipantsPage = {
         return rootNode;
     },
     async afterRender(router) {
+        const _participantList = await fetch('http://5e1c4ab6db8a52001414ccdd.mockapi.io/api/v1/Participants');
+        const _participantListJSON = await _participantList.json();
+
+        const _content = document.getElementById('ib_content');
+        await (new Promise((res, rej) => setTimeout(res(), 1000)));
+
+        _content.innerHTML = '';
+
+        _participantListJSON.forEach(participant => {
+            const _column = createDIV('col-sm-4 card-container');
+            _column.appendChild(createParticipantCard(participant));
+            _content.appendChild(_column);
+        });
 
     }
 }

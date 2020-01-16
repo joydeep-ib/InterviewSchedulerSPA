@@ -48,7 +48,6 @@ export const InterviewsPage = {
             _column.appendChild(createInterviewCard(router, interview, i));
             _content.appendChild(_column);
         });
-        console.log(_interviewListJSON);
     }
 };
 
