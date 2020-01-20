@@ -34,6 +34,13 @@ module.exports = {
         ]
     },
     devServer: {
-        historyApiFallback: true
+        historyApiFallback: true,
+        proxy: {
+            "/api": {
+                target: "http://192.168.1.5:3000"
+            },
+        },
+        host: '0.0.0.0',
+	disableHostCheck: true,
     },
 }
