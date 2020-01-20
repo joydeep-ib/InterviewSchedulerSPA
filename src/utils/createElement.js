@@ -58,21 +58,21 @@ export const createNavBar = (router) => {
   return _navBar;
 }
 
-export const createInterviewCard = (router, interview, i) => {
+export const createInterviewCard = (router, interview, showParticipants=true) => {
   const _card = createDIV("card");
-  const _cardHeader = createTextElement('h3', `Interview #${i}`, 'card-header')
+  console.log(interview);
+  const _cardHeader = createLink(router, `Interview#${interview.id}`, ['interview', interview.id], 'card-header')
   const _cardBody = createDIV("card-body");
 
   _cardBody.appendChild(createTextElement('h4', interview.title.toUpperCase(), 'card-title'));
-  _cardBody.appendChild(createTextElement('h6', `Scheduled at: ${interview.scheduledAt}`, 'card-subtitle mb-2 text-muted'));
-  _cardBody.appendChild(createTextElement('p', interview.description, 'card-text'));
-  interview.participants.forEach((id) => {
-    _cardBody.appendChild(createLink(router, `Participant #${id}`, ['participants',id], 'card-link'))
+  _cardBody.appendChild(createTextElement('h6', `Scheduled at: ${interview.startdt}`, 'card-subtitle mb-2 text-muted'));
+  _cardBody.appendChild(createTextElement('h6', `Ends at: ${interview.enddt}`, 'card-subtitle mb-2 text-muted'));
 
-  })
+  _cardBody.appendChild(createTextElement('p', interview.description, 'card-text'));
+
   const _cardFooter = createDIV("card-footer");
-  _cardFooter.appendChild(createTextElement('h6', `Created at: ${interview.createdAt}`, 'card-subtitle mb-2 text-muted'))
-  _cardFooter.appendChild(createTextElement('h6', `Updated at: ${interview.editedAt}`, 'card-subtitle mb-2 text-muted'))
+  _cardFooter.appendChild(createTextElement('h6', `Created at: ${interview.created_at}`, 'card-subtitle mb-2 text-muted'))
+  // _cardFooter.appendChild(createTextElement('h6', `Updated at: ${interview.editedAt}`, 'card-subtitle mb-2 text-muted'))
 
   _card.appendChild(_cardHeader);
   _card.appendChild(_cardBody);
@@ -80,11 +80,11 @@ export const createInterviewCard = (router, interview, i) => {
   return _card;
 }
 
-export const createParticipantCard = (participant) => {
+export const createParticipantCard = (router, participant) => {
   const _card = createDIV("card");
   const _cardBody = createDIV("card-body");
-  _cardBody.appendChild(createTextElement('h4', participant.name.toUpperCase(), 'card-title'));
-  _cardBody.appendChild(createTextElement('h6', `Participant ID: ${participant.id}`, 'card-subtitle mb-2 text-muted'));
+  _cardBody.appendChild(createLink(router, participant.name.toUpperCase(), ['participant', participant.id], 'display-5'));
+  _cardBody.appendChild(createTextElement('h6', `Participant ID: ${participant.id}`, ));
   _cardBody.appendChild(createTextElement('p', participant.email, 'card-text'));
   const _cardFooter = createDIV("card-footer");
   const _resumeLink = document.createElement('a');
