@@ -7,6 +7,7 @@ import {
     createFormField,
     createMultiSelect,
     createSelectOption,
+    createParticipantCard,
 } from "../utils/createElement";
 import './interview.scss';
 
@@ -40,17 +41,77 @@ export const InterviewsPage = {
     async afterRender(router) {
         const _content = document.getElementById('ib_content');
         await (new Promise((res, rej) => setTimeout(res(), 1000)));
-        const _interviewList = await fetch('http://5e1c4ab6db8a52001414ccdd.mockapi.io/api/v1/Interviews');
+        const _interviewList = await fetch('/api/v1/interviews');
         const _interviewListJSON = await _interviewList.json();
         _content.innerHTML = '';
         _interviewListJSON.forEach((interview, i) => {
             const _column = createDIV('col-sm-4 card-container');
-            _column.appendChild(createInterviewCard(router, interview, i));
+            _column.appendChild(createInterviewCard(router, interview));
             _content.appendChild(_column);
         });
     }
 };
 
+export const InterviewPage = {
+    path: '/interview/:id',
+    clickable: false,
+    title: 'Interview',
+    async render(params, router) {
+        const rootNode = document.createElement('div');
+        rootNode.appendChild(createNavBar(router));
+
+        const _container = createDIV('container');
+        _container.appendChild(document.createElement('br'));
+
+        _container.appendChild(createTextElement('h2', `Interview ${params.id}`));
+        _container.appendChild(document.createElement('hr'));
+        _container.appendChild(document.createElement('br'));
+
+        const _content = createDIV('row');
+        _content.id = 'ib_content';
+
+        _container.appendChild(_content);
+        rootNode.appendChild(_container);
+        // Time to mount the dom
+        setImmediate(() => this.loadData(params.id, router));
+        return rootNode;
+    },
+    async afterRender() {
+    },
+    async loadData(id, router) {
+        const _interview = await fetch(`/api/v1/interviews/${id}`);
+        const _interviewJSON = await _interview.json();
+
+        const _content = document.getElementById('ib_content');
+
+        const _column1 = createDIV('col-sm-5');
+        _column1.appendChild(createInterviewCard(router, _interviewJSON, false));
+
+        const _column2 = createDIV('col-sm-5');
+        _column2.id = 'ib_content_participants';
+
+        const _column3 = createDIV('col-sm-2');
+        const _editButton = createLink(router, 'Edit', ['interview', id, 'edit'], "btn btn-link btn-md");
+        const _deleteButton = createLink(router, 'Delete', ['interview', id, 'delete'], "btn btn-danger btn-md");
+        _column3.appendChild(_editButton);
+        _column3.appendChild(_deleteButton);
+
+        setImmediate(() => this.loadParticipants(_interviewJSON.participants));
+        _content.appendChild(_column1);
+        _content.appendChild(_column2);
+        _content.appendChild(_column3);
+
+    },
+    async loadParticipants(participants) {
+        const _column2 = document.getElementById('ib_content_participants');
+        for (const _participant of participants) {
+            // const _participant = await fetch(`/api/v1/participants/${id}`);
+            // const _participantJSON = await _participant.json();
+            _column2.appendChild(createParticipantCard(router, _participant));
+            _column2.appendChild(document.createElement('br'));
+        }
+    }
+}
 export const NewInterviewPage = {
     path: '/interviews/new',
     clickable: false,
@@ -65,9 +126,33 @@ export const NewInterviewPage = {
 
         const _form = document.createElement('form');
         _form.id = 'interviewForm';
-        _form.onsubmit = (e) => {
+        _form.onsubmit = async (e) => {
             e.preventDefault();
-            alert("Thanks for scheduling an interview. As the API part is missing, this won't result a new interview. Sorry for that :P")
+            const data  = {};
+            for (const elem of e.srcElement.elements) {
+                if (elem.type !== "select-multiple") {
+                    data[elem.name] = elem.value;
+                } else {
+                    data[elem.name] = [];
+                    for (const option of elem.options) {
+                        if (option.selected) {
+                            data[elem.name].push(option.value);
+                        }
+                    }
+                }
+            }
+            console.log(data);
+            const _formResp = await fetch('/api/v1/interviews', {
+                method: 'post',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (_formResp.status === 200) {
+                alert('Interview Scheduled');
+            }
+            e.preventDefault();
         }
         _form.appendChild(createFormField('interviewTitle', 'Title', 'text', 'title'));
         _form.appendChild(createFormField('interviewDescription', 'Description', 'text', 'description'));
@@ -87,8 +172,7 @@ export const NewInterviewPage = {
         return _rootNode;
     },
     async afterRender(router) {
-        await (new Promise((res, rej) => setTimeout(res(), 1000)));
-        const _participantList = await fetch('http://5e1c4ab6db8a52001414ccdd.mockapi.io/api/v1/Participants');
+        const _participantList = await fetch('/api/v1/participants');
         const _participantListJSON = await _participantList.json();
         const optionsElem = document.getElementById('interviewParticipants');
         optionsElem.innerHTML = '';
